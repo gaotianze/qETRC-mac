@@ -1,4 +1,4 @@
-﻿#include "qesystem.h"
+#include "qesystem.h"
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
@@ -67,7 +67,11 @@ void SystemJson::fromJson(const QJsonObject& obj)
             .toString(default_raildb_file);
     table_row_height = obj.value("table_row_height").toInt(table_row_height);
     show_train_tooltip = obj.value("show_train_tooltip").toBool(show_train_tooltip);
+#ifdef Q_OS_MAC
+    ribbon_style = obj.value("ribbon_style").toInt(34);
+#else
     ribbon_style = obj.value("ribbon_style").toInt(18);
+#endif
     // 2024.03.28: for old version
     if (ribbon_style == 0) ribbon_style = 17;
     else if (ribbon_style == 1) ribbon_style = 18;

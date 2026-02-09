@@ -1,4 +1,4 @@
-﻿#include "trainline.h"
+#include "trainline.h"
 #include "data/common/stationname.h"
 #include "data/train/train.h"
 #include "trainadapter.h"
@@ -384,7 +384,7 @@ void TrainLine::diagnoInterval(DiagnosisList& res, ConstAdaPtr prev, ConstAdaPtr
                     rcur, shared_from_this(), 
                     tcur->arrive, rcur->mile, QObject::tr("非预期的区间终止：在匹配站表的"
                         "[%1-%2]区间。可能是运行线行别出现问题。")
-                    .arg(rprev->name, rcur->name)));
+                    .arg(rprev->name.toSingleLiteral(), rcur->name.toSingleLiteral())));
             }
         }
     }

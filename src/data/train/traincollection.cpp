@@ -1,4 +1,4 @@
-﻿#include "traincollection.h"
+#include "traincollection.h"
 #include "routing.h"
 #include "train.h"
 #include "traintype.h"

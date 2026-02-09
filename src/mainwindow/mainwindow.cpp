@@ -1,4 +1,4 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 #include "data/rail/railway.h"
 #include "data/rail/ruler.h"
 
@@ -55,7 +55,7 @@
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
 #include "SARibbonMenu.h"
-#include "SARibbonPannel.h"
+#include "SARibbonPanel.h"
 #include "SARibbonQuickAccessBar.h"
 #include <SARibbonToolButton.h>
 
@@ -93,7 +93,11 @@
 #include "editors/train/batchaddtraintagdialog.h"
 
 MainWindow::MainWindow(QWidget* parent)
+#ifdef Q_OS_MAC
+	: SARibbonMainWindow(parent, SARibbonMainWindowStyleFlag::UseRibbonMenuBar | SARibbonMainWindowStyleFlag::UseNativeFrame),
+#else
 	: SARibbonMainWindow(parent),
+#endif
 	undoStack(new QUndoStack(this)),
 	naviModel(new DiagramNaviModel(_diagram, this))
 {
@@ -761,12 +765,19 @@ void MainWindow::initDockWidgets()
 void MainWindow::initToolbar()
 {
 	SARibbonBar* ribbon = ribbonBar();
+#ifdef Q_OS_MAC
+	ribbon->setApplicationButton(nullptr);
+#else
 	ribbon->applicationButton()->setText(QStringLiteral("文件"));
+#endif
 	ribbon->showMinimumModeButton();
 
 	//顶上的工具条
 	QAction* actGlobalConfig;
 	if constexpr (true) {
+#ifdef Q_OS_MAC
+		// macOS下不显示Quick Access Bar，因为没有合适的地方放
+#else
 		//撤销重做
 		QAction* act = undoStack->createUndoAction(this, tr("撤销"));
 		act->setObjectName(tr("撤销"));
@@ -794,7 +805,7 @@ void MainWindow::initToolbar()
 		actsub = menu->addAction(tr("Ribbon选项"), this, &MainWindow::actRibbonConfig);
 		act->setIcon(QEICN_global_config);
 		act->setMenu(menu);
-		ribbon->quickAccessBar()->addAction(act, Qt::ToolButtonIconOnly, QToolButton::InstantPopup);
+		ribbon->quickAccessBar()->addMenuAction(act, QToolButton::InstantPopup);
 
 		// Customize 似乎还不太对，先留在这
 		// 2024.04.04: Enable it
@@ -804,6 +815,7 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actCustomizeRibbon);
 		ribbon->quickAccessBar()->addAction(act);
 #endif
+#endif
 
 	}
 
@@ -811,7 +823,7 @@ void MainWindow::initToolbar()
 	//开始
 	if constexpr (true) {
 		SARibbonCategory* cat = ribbon->addCategoryPage(QObject::tr("开始(&1)"));
-		SARibbonPannel* panel = cat->addPannel(QObject::tr("文件"));
+		SARibbonPanel* panel = cat->addPanel(QObject::tr("文件"));
 
 		QAction* act = makeAction(QEICN_new_file, QObject::tr("新建"));
 		panel->addLargeAction(act);
@@ -851,7 +863,7 @@ void MainWindow::initToolbar()
 		addAction(act);
 		panel->addMediumAction(act);
 
-		panel = cat->addPannel(tr("窗口"));
+		panel = cat->addPanel(tr("窗口"));
 		act = naviDock->toggleViewAction();
 		act->setShortcut(Qt::Key_F3);
 		addAction(act);
@@ -908,13 +920,13 @@ void MainWindow::initToolbar()
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
-		panel = cat->addPannel(tr("设置"));
+		panel = cat->addPanel(tr("设置"));
 		act = makeAction(QEICN_diagram_option, tr("运行图选项"));
 		act->setToolTip(tr("运行图选项\n包含与运行图计算相关的基本设置项"));
 		connect(act, &QAction::triggered, this, &MainWindow::actDiagramOption);
 		panel->addLargeAction(act);
 
-		panel = cat->addPannel(tr("更新"));
+		panel = cat->addPanel(tr("更新"));
 		act = makeAction(QEICN_global_refresh, tr("刷新"));
 		act->setToolTip(tr("刷新 (F5)\n重新铺画运行图，更新所有数据面板的信息。"));
 		act->setShortcut(Qt::Key_F5);
@@ -938,7 +950,7 @@ void MainWindow::initToolbar()
         panel->addLargeAction(act);
 		//btn->setMinimumWidth(80);
 
-		panel = cat->addPannel(tr("系统"));
+		panel = cat->addPanel(tr("系统"));
 		act = makeAction(QEICN_help, tr("帮助"));
 		connect(act, &QAction::triggered, this, &MainWindow::showHelpDialog);
 		panel->addLargeAction(act);
@@ -960,7 +972,7 @@ void MainWindow::initToolbar()
 	QAction* actQuickPath, * actSelector;
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("线路(&2)"));
-		auto* panel = cat->addPannel(tr("基础数据"));
+		auto* panel = cat->addPanel(tr("基础数据"));
 
 		auto* act = makeAction(QEICN_import_rails, tr("导入线路"));
 		//connect(act, SIGNAL(triggered()), naviView, SLOT(importRailways()));
@@ -1006,7 +1018,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("新建线路\n新建空白的铁路线路"));
 		panel->addLargeAction(act);
 
-		panel = cat->addPannel(tr("调整"));
+		panel = cat->addPanel(tr("调整"));
 
 		act = makeAction(QEICN_read_ruler_wizard, tr("标尺综合"));
 		act->setShortcut(Qt::CTRL | Qt::SHIFT | Qt::Key_B);
@@ -1025,7 +1037,7 @@ void MainWindow::initToolbar()
 		addAction(act);
 		panel->addLargeAction(act);
 
-		panel = cat->addPannel(tr("路网管理"));
+		panel = cat->addPanel(tr("路网管理"));
 
 		act = makeAction(QEICN_rail_db, tr("数据库"));
 		act->setToolTip(tr("线路数据库 (Ctrl+H)\n"
@@ -1066,7 +1078,7 @@ void MainWindow::initToolbar()
 	//列车
 	if constexpr (true) {
 		auto* cat = ribbon->addCategoryPage(tr("列车(&3)"));
-		auto* panel = cat->addPannel(tr("车次管理"));
+		auto* panel = cat->addPanel(tr("车次管理"));
 
 		auto* act = actTrainList;
 		panel->addLargeAction(act);
@@ -1146,7 +1158,7 @@ void MainWindow::initToolbar()
 		panel->addMediumAction(act);
 		connect(act, SIGNAL(triggered()), naviView, SLOT(actAddTrain()));
 
-		panel = cat->addPannel(tr("工具"));
+		panel = cat->addPanel(tr("工具"));
 
 		act = timetableQuickDock->toggleViewAction();
 		act->setIcon(QEICN_timetable_quick);
@@ -1171,7 +1183,7 @@ void MainWindow::initToolbar()
 		panel->addLargeAction(act);
 		connect(act, &QAction::triggered, this, &MainWindow::actEditFilters);
 
-		panel = cat->addPannel(tr("运行线控制"));
+		panel = cat->addPanel(tr("运行线控制"));
 
 		if constexpr (true) {
 			auto* sp = new QSpinBox;
@@ -1188,14 +1200,14 @@ void MainWindow::initToolbar()
 			w->setObjectName(tr("最大跨越站数面板"));
 			w->setWindowTitle(tr("最大跨越站数"));
 
-			panel->addWidget(w, SARibbonPannelItem::Large);
+			panel->addWidget(w, SARibbonPanelItem::Large);
 
 			act = makeAction(QEICN_apply_pass_stations, tr("应用"), tr("应用最大跨越站数"));
 			connect(act, SIGNAL(triggered()), this, SLOT(actChangePassedStations()));
 			panel->addLargeAction(act);
 		}
 
-		panel = cat->addPannel(tr("选项"));
+		panel = cat->addPanel(tr("选项"));
 		act = makeAction(QEICN_weaken_unselect, tr("背景虚化"));
 		act->setToolTip(tr("背景虚化\n若启用，则在选中列车运行线时，自动虚化其他列车运行线。"
 			"点击空白处取消选择则取消虚化。\n"
@@ -1205,7 +1217,7 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actToggleWeakenUnselected);
 		panel->addLargeAction(act);
 
-		panel = cat->addPannel(tr("交路"));
+		panel = cat->addPanel(tr("交路"));
 		act = routingDock->toggleViewAction();
 		act->setObjectName(tr("交路面板开关"));
 		act->setIcon(QEICN_routing_edit);
@@ -1225,7 +1237,7 @@ void MainWindow::initToolbar()
 		act->setToolTip(tr("批量识别车次\n对所有交路，尝试识别车次，使得虚拟车次转变为实体车次。"));
 		panel->addMediumAction(act);
 
-		panel = cat->addPannel(tr("标签"));
+		panel = cat->addPanel(tr("标签"));
 		act = makeAction(QEICN_train_tag_manager, tr("标签管理"), tr("列车标签管理"));
 		act->setToolTip(tr("列车标签管理\n查看或编辑本运行图文件中的所有列车标签"));
 		connect(act, &QAction::triggered, this, &MainWindow::actTrainTagManager);
@@ -1236,7 +1248,7 @@ void MainWindow::initToolbar()
 
 		panel->addLargeAction(act, QToolButton::MenuButtonPopup);
 
-		panel = cat->addPannel(tr("分析"));
+		panel = cat->addPanel(tr("分析"));
 		act = makeAction(QEICN_compare_trains, tr("车次对照"));
 		act->setToolTip(tr("两车次运行对照\n在指定线路上，对比两个选定车次的运行情况。"));
 		connect(act, SIGNAL(triggered()), this, SLOT(actTrainDiff()));
@@ -1269,13 +1281,13 @@ void MainWindow::initToolbar()
 		connect(act, &QAction::triggered, this, &MainWindow::actTrainIntervalStat);
 		panel->addLargeAction(act);
 
-		panel = cat->addPannel(tr("调整"));
+		panel = cat->addPanel(tr("调整"));
 		act = makeAction(QEICN_merge_trains, tr("合并车次"));
 		act->setToolTip(tr("合并车次\n将多个车次按顺序合并为新建车次"));
 		actMergeTrains = act;
 		panel->addLargeAction(act);
 
-		panel = cat->addPannel(tr("排图"));
+		panel = cat->addPanel(tr("排图"));
 
 		act = makeAction(QEICN_ruler_paint, tr("标尺排图"));
 		addAction(act);
@@ -1338,8 +1350,12 @@ void MainWindow::initToolbar()
 		catView = new ViewCategory(this, cat, this);
 		connect(trainListWidget->getModel(), &TrainListModel::trainShowChanged,
 			catView, &ViewCategory::actChangeSingleTrainShow);
+#ifdef Q_OS_MAC
+		// macOS下actGlobalConfig未定义，因为Quick Access Bar被隐藏
+#else
 		connect(actGlobalConfig, &QAction::triggered, catView,
 			&ViewCategory::actSystemJsonDialog);
+#endif
 		connect(trainListWidget, &TrainListWidget::autoAddNewType,
 			[this](std::shared_ptr<TrainType> nty) {
 				undoStack->push(new qecmd::AutoAddTrainType(_diagram.trainCollection().typeManager(), nty, catView));
@@ -2318,7 +2334,6 @@ void MainWindow::refreshAll()
 	//直接由Main管理的子页面
 	naviModel->resetModel();
 	trainListWidget->refreshData();
-	routingWidget->refreshData();   //2025.09.21 fix
 	pathListWidget->refreshData();
 	for (auto p : railStationWidgets) {
 		p->refreshData();

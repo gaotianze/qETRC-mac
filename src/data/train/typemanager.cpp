@@ -1,4 +1,4 @@
-﻿#include "typemanager.h"
+#include "typemanager.h"
 #include "traintype.h"
 #include "trainname.h"
 #include "data/common/qesystem.h"
