@@ -1,3 +1,5 @@
+**在[YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc)版本基础上，修复m芯片mac上的若干Ribbon编译问题，并修改部分UI样式使其与macOS匹配。此外，提供编译好的.dmg文件以供mac端直接安装使用（仅针对m系列芯片编译，后续可能会补充universal版本）。**
+
 # qETRC
 
 Electronic Train Running Chart implemented with Qt
@@ -16,7 +18,7 @@ Electronic Train Running Chart implemented with Qt
 
 自2023年6月16日起，改为使用CMake构建，原基于qmake的构建流程作废。详见[build](doc/build.md)。
 
-2025年9月18日起新增MAC OS上的构建脚本，由[YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc)提供。详见[build_on_mac](doc/build_on_mac.md)。
+2025年9月18日起新增MAC OS上的构建脚本，由[YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc)提供。详见[build_on_mac](doc/build_on_mac.md)。 
 
 2025年12月1日起新增ArchLinux构建相关支持，由[ParadoxMoranis (Paradox.poole)](https://github.com/ParadoxMoranis)提供。详见[build_on_arch_linux](docs/build_on_arch_linux.md)。
 
