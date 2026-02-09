@@ -1,5 +1,9 @@
 **在[YQYQYQ123abc (Roean)](https://github.com/YQYQYQ123abc)版本基础上，修复m芯片mac上的若干Ribbon编译问题，并修改部分UI样式使其与macOS匹配。此外，提供编译好的.dmg文件以供mac端直接安装使用（仅针对m系列芯片编译，后续可能会补充universal版本）。**
 
+以下为原项目（qETRC）说明
+
+---
+
 # qETRC
 
 Electronic Train Running Chart implemented with Qt
